@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -12,10 +13,6 @@ type Block struct {
 	Data          []byte
 	PrevBlockHash []byte
 	Hash          []byte
-}
-
-func main() {
-
 }
 
 func (b *Block) SetHash() {
@@ -32,7 +29,12 @@ func (b *Block) SetHash() {
 }
 
 func NewBlock(data string, prevBlockHash []byte) *Block {
-	block := &Block(time.Now().Unix(), []byte(data), prevBlockHash, []byte{})
+	block := &Block{
+		Timestamp:     time.Now().Unix(),
+		Data:          []byte(data),
+		PrevBlockHash: prevBlockHash,
+		Hash:          []byte{},
+	}
 	block.SetHash()
 	return block
 }
@@ -52,5 +54,22 @@ func NewGenesisBlock() *Block {
 }
 
 func NewBlockchain() *Blockchain {
-	return &Blockchain{[]*Block{NewGenesisBlock()}}
+	genesisBlock := NewGenesisBlock()
+	return &Blockchain{
+		blocks: []*Block{genesisBlock},
+	}
+}
+
+func main() {
+	bc := NewBlockchain()
+	bc.AddBlock("Send 1 BTC to Somu")
+	bc.AddBlock("Send 2 more BTC to Somu")
+
+	for _, block := range bc.blocks {
+		fmt.Printf("Prev. hash: %x\n", block.PrevBlockHash)
+		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("Hash: %x\n", block.Hash)
+		fmt.Println()
+	}
+
 }
